@@ -1,0 +1,133 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+
+	[merge]
+	tool = meld
+	[diff]
+	tool = meld
+[diff "odt"]
+	binary = true
+	textconv = odt2txt
+
+[alias]
+
+	#initialize empty repository
+	#init
+	a = add
+	ap = add -p
+	c = commit
+	d = diff
+	ds = diff --stat
+	dc = diff --cached
+
+	s = status -s
+	co = checkout
+	
+	# list branches sorted by last modified
+	b = "!git for-each-ref --sort='-authordate' --format='%(authordate)%09%(objectname:short)%09%(refname)' refs/heads | sed -e 's-refs/heads/--'"
+
+
+	# list aliases
+	la = "!git config -l | grep alias | cut -c 7-"
+
+	#setup name and email to be able to commit
+	setupGlobal = "!f(){ git config --global user.name \"$1\" && git config --global user.email \"$2\" && git config --global core.editor \"vim\"; };f"
+	#install sexy bash prompt
+	installSexyPromp = "!f(){ cd /tmp && git clone --depth 1 https://github.com/twolfson/sexy-bash-prompt && cd sexy-bash-prompt && make install; };f && source ~/.bashrc"	
+
+	#view recent commits
+	hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+	#pretty graph. use -n5 to show only last five
+	graph = log --all --graph --decorate --oneline -n30	
+	
+	#list commits
+	ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
+	#list commits with changes	
+	ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+	#List oneline commits with date
+	lds = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short
+	#List commits showing relative dates
+	ld = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=relative
+
+
+	#show the history of a file
+	filelog = log -u
+	fl = log -u
+	
+	#find filename in codebase
+	f = "!git ls-files | grep -i"
+
+	#show files modified in last commit
+	dl = "!git ll -1"
+
+
+	#show last tags
+	lasttag = describe --tags --abbrev=0
+	lt = describe --tags --abbrev =0
+
+	#commit all changes with message
+	ca = "!f(){ git commit -am \"$1\"; };f"
+	
+	#add all untracked files, then commit all changes with message
+	caa = "!f(){ git add * && git commit -am \"$1\"; };f"
+
+
+
+
+	# pull remote branch, rebase local changes, remove branches no lo longer exists remotely
+	up = !git pull --rebase --prune $@ && git submodule update --init --recursive
+	#checkout new branch
+	cob = checkout -b
+	
+	#adds changes and creates a commit with default message for work in progress"
+	save = !git add -A && git commit -m 'SAVEPOINT'
+	#delete last commit but keep changes in working directory
+	undo = reset HEAD~1 --mixed
+	#open commit editor to enable changing the commit message
+	amend = commit -a --amend
+
+	#reset working directory to last commit, only we make a commit first so it it possible to restore later
+	#to regret, use git reflog to identify the commit, and check it out
+	wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard	
+	
+
+	cob = checkout -b
+
+
+	#see how the current checked out branch differes to all similarly named branches on tracked remotes
+	cb = !git branch | grep ^* | cut -d' ' -f2
+ 	sb = !ls .git/refs/remotes/*/$(git cb) | cut -d/ -f4,5 | \
+       xargs git show-branch $(git cb)
+
+	#search for text in all commits anywhere in the repo
+	rgrep = !git grep
+
+	#stage some of the working tree modifications
+	ap = add -p
+	
+	#rewrite history, back until the commit given as argument
+	rewrite = rebase -i	
+
+
+	#patche
+	#committe deler av work directory
+	#lage feature branch
+	#merge feature branch
+	
+
+	#rydde i mange rare committer
+	fixup = !sh -c 'git commit -m \"fixup! $(git log -1 --format='\\''%s'\\'' $@)\"' -
+	squash = !sh -c 'git commit -m \"squash! $(git log -1 --format='\\''%s'\\'' $@)\"' -
+	ri = rebase --interactive --autosquash
+
+	
+	#pull remote branch that might have new committs, and rebase own changes onto remote
+	#usage: git pr remote branch
+	pr = pull --rebase 
+
+[remote "github"]
+	url = https://github.com/Lykurgos/simpleFlow.git
+	fetch = +refs/heads/*:refs/remotes/github/*
