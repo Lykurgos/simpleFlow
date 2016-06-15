@@ -68,6 +68,10 @@
 	lasttag = describe --tags --abbrev=0
 	lt = describe --tags --abbrev =0
 
+	#stage and commit parts of files in the working directory
+	ap = add --patch
+	cm = commit -m
+
 	#commit all changes with message
 	ca = "!f(){ git commit -am \"$1\"; };f"
 	
